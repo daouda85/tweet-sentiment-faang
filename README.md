@@ -12,20 +12,12 @@
 ## 🎥 Live Demo Video
 
 ### **Watch the Full Demo**
-![Demo Video](assets/demo.mp4)
+https://youtu.be/_fnvG-_9uZg
 
 *Click the video above to play/download (MP4, ~50MB)*
 
-### **Demo Timeline:**
-⏱️ **0:00-0:45** - Project overview and setup  
-⏱️ **0:45-1:30** - Dashboard interface tour  
-⏱️ **1:30-2:15** - Real-time sentiment analysis  
-⏱️ **2:15-3:00** - FAANG company comparisons  
-⏱️ **3:00-3:45** - API documentation and testing  
-
 ### **Direct Download Links:**
-- [📥 Full Demo Video (MP4)](assets/demo.mp4)
-- [📥 Presentation Slides (PDF)](assets/presentation.pdf)
+https://youtu.be/_fnvG-_9uZg
 
 ---
 
