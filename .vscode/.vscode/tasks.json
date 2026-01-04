@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python -m pip install -r requirements.txt",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run All Services",
+            "dependsOn": ["Start API", "Start Dashboard"],
+            "group": "build"
+        },
+        {
+            "label": "Start API",
+            "type": "shell",
+            "command": "uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload",
+            "isBackground": true,
+            "group": "build",
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".*Application startup complete.*",
+                        "endsPattern": ".*Shutdown complete.*"
+                    }
+                }
+            ]
+        },
+        {
+            "label": "Start Dashboard",
+            "type": "shell",
+            "command": "streamlit run src/dashboard/app.py",
+            "isBackground": true,
+            "group": "build"
+        }
+    ]
+}
