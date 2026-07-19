@@ -24,7 +24,7 @@ https://youtu.be/_fnvG-_9uZg
 ## 📖 Table of Contents
 - [📊 Project Overview](#-project-overview)
 - [🚀 Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
+- [🛠️ Tech Stack](#-tech-stack)
 - [📁 Project Structure](#-project-structure)
 - [🚦 Quick Start](#-quick-start)
 - [🔧 Configuration](#-configuration)
@@ -86,17 +86,12 @@ A real-time sentiment analysis dashboard for tracking Twitter/X sentiment around
 
 ```
 tweet-sentiment-faang/
-├── app/                    # FastAPI backend
-│   ├── api/               # REST endpoints
-│   ├── core/              # Config & security
-│   ├── db/                # Database models
-│   ├── ml/                # ML models
-│   └── services/          # Business logic
-├── dashboard/             # Streamlit frontend
-│   ├── pages/             # Multi-page app
-│   └── components/        # UI components
-├── docker/                # Containerization
-├── notebooks/             # Jupyter notebooks
+├── src/
+│   ├── api/main.py         # FastAPI backend
+│   ├── dashboard/app.py    # Streamlit frontend
+│   ├── data/               # Data sources and importers
+│   ├── models/             # Sentiment analyzer
+│   └── utils/              # Logging helpers
 ├── tests/                 # Test suite
 ├── pyproject.toml         # Dependencies
 ├── requirements.txt       # Pip requirements
@@ -133,13 +128,29 @@ cp .env.example .env
 # Add your Twitter API keys to .env
 
 # Run backend
-cd app
-uvicorn main:app --reload --port 8000
+uvicorn src.api.main:app --reload --port 8000
 
 # Run dashboard (new terminal)
-cd dashboard
-streamlit run app.py
+streamlit run src/dashboard/app.py
 ```
+
+### **Optional Xquik or TweetClaw Export Source**
+
+The API can read reviewed
+[Xquik or TweetClaw tweet exports](https://github.com/Xquik-dev/x-twitter-scraper/blob/master/task-guides/export-tweets-csv.md)
+before falling back to mock data. CSV, JSON, JSONL, and NDJSON files are
+supported when they include a text-like column such as `text`, `content`,
+`tweet_text`, or `full_text`.
+
+```bash
+export XQUIK_EXPORT_PATH=./exports/xquik-tweets.jsonl
+uvicorn src.api.main:app --reload --port 8000
+```
+
+Imported rows are mapped into the existing dashboard shape with author,
+timestamp, hashtag, engagement, sentiment, and confidence fields when present.
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
 
 ## 🔧 Configuration
 
@@ -158,6 +169,9 @@ REDIS_URL=redis://localhost:6379/0
 # App Settings
 SECRET_KEY=your_secret_key_here
 DEBUG=False
+
+# Optional local export source
+XQUIK_EXPORT_PATH=./exports/xquik-tweets.jsonl
 ```
 
 ## 📊 API Endpoints
@@ -253,13 +267,13 @@ response = requests.post(
 pytest
 
 # Run with coverage
-pytest --cov=app tests/
+pytest --cov=src tests/
 
 # Run specific test file
-pytest tests/test_sentiment.py -v
+pytest tests/test_xquik_import.py -v
 ```
 
-**Test Coverage:** >85% unit tests, >70% integration tests
+The current suite covers export normalization and the configured API source.
 
 ## 🚀 Deployment
 
