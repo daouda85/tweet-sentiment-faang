@@ -1,11 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from datetime import datetime, timedelta
 import uvicorn
 import random
-from typing import List, Dict, Any
+from typing import Any, Dict, List, Optional
 import json
+import os
+from starlette.responses import JSONResponse
+
+from src.data.xquik_import import load_xquik_export
 
 # ========== CONFIGURATION (No imports needed) ==========
 class APIConfig:
@@ -21,6 +25,7 @@ class TwitterConfig:
     SEARCH_QUERY: str = "artificial intelligence OR machine learning OR AI"
     MAX_TWEETS: int = 100
     LANGUAGE: str = "en"
+    XQUIK_EXPORT_PATH: Optional[str] = os.getenv("XQUIK_EXPORT_PATH")
 
 # Create config instances
 api_config = APIConfig()
@@ -175,12 +180,14 @@ async def get_tweets(
     - start_date: Filter tweets after this date (ISO format)
     - end_date: Filter tweets before this date (ISO format)
     """
-    # Validate limit
-    if limit > 100:
-        limit = 100
-    
-    # Generate mock tweets
-    tweets = mock_generator.generate_tweets(limit)
+    limit = max(1, min(limit, 100))
+
+    source = "mock_data"
+    if twitter_config.XQUIK_EXPORT_PATH:
+        tweets = load_xquik_export(twitter_config.XQUIK_EXPORT_PATH, limit)
+        source = "xquik_export"
+    else:
+        tweets = mock_generator.generate_tweets(limit)
     
     # Apply filters if provided
     if sentiment:
@@ -204,11 +211,12 @@ async def get_tweets(
         "count": len(tweets),
         "tweets": tweets,
         "query": twitter_config.SEARCH_QUERY,
+        "source": source,
         "generated_at": datetime.now().isoformat()
     }
 
 @app.post("/api/analyze")
-async def analyze_text(text: str):
+async def analyze_text(text: str = Form(...)):
     """
     Analyze sentiment of a given text
     - text: The text to analyze
